@@ -1,13 +1,13 @@
 package com.example.demo_crud.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import com.example.demo_crud.repository.ArticuloRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "boletas")
 public class Boleta {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,131 +15,84 @@ public class Boleta {
     private String cliente;
     private String direccion;
     private String ruc;
-    private LocalDate fechaEmision;
-    private LocalDate fechaVencimiento;
+    private String fechaEmision;
+    private String fechaVencimiento;
     private String localidad;
     private String guiaRemision;
     private String vendedor;
     private String formaDePago;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "boleta")
+    private List<DetalleBoleta> detalles = new ArrayList<>();
+
     private Double descuento;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "boleta_id")
-    private List<Articulo> articulos;
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+@Transient // Para que no sea persistido en la base de datos
+    private double total;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Transient
+    private double valorDeVenta;
 
-    public String getCliente() {
-        return cliente;
-    }
+    @Transient
+    private double igv;
 
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
-    }
+    @Transient
+    private double precioDeVenta;
 
-    public String getDireccion() {
-        return direccion;
-    }
+    // Inyección del repositorio de artículos
+    @Transient
+    private ArticuloRepository articuloRepository;
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+    // Getters y setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getCliente() { return cliente; }
+    public void setCliente(String cliente) { this.cliente = cliente; }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public String getRuc() { return ruc; }
+    public void setRuc(String ruc) { this.ruc = ruc; }
+    public String getFechaEmision() { return fechaEmision; }
+    public void setFechaEmision(String fechaEmision) { this.fechaEmision = fechaEmision; }
+    public String getFechaVencimiento() { return fechaVencimiento; }
+    public void setFechaVencimiento(String fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }
+    public String getLocalidad() { return localidad; }
+    public void setLocalidad(String localidad) { this.localidad = localidad; }
+    public String getGuiaRemision() { return guiaRemision; }
+    public void setGuiaRemision(String guiaRemision) { this.guiaRemision = guiaRemision; }
+    public String getVendedor() { return vendedor; }
+    public void setVendedor(String vendedor) { this.vendedor = vendedor; }
+    public String getFormaDePago() { return formaDePago; }
+    public void setFormaDePago(String formaDePago) { this.formaDePago = formaDePago; }
+    public List<DetalleBoleta> getDetalles() { return detalles; }
+    public void setDetalles(List<DetalleBoleta> detalles) { this.detalles = detalles; }
+    public Double getDescuento() { return descuento; }
+    public void setDescuento(Double descuento) { this.descuento = descuento; }
+    public Double getIgv() { return igv; }
+    public void setIgv(Double igv) { this.igv = igv; }
+    public Double getTotal() { return total; }
+    public void setTotal(Double total) { this.total = total; }
+    public Double getValorDeVenta() { return valorDeVenta; }
+    public void setValorDeVenta(Double valorDeVenta) { this.valorDeVenta = valorDeVenta; }
+    public Double getPrecioDeVenta() { return precioDeVenta; }
+    public void setPrecioDeVenta(Double precioDeVenta) { this.precioDeVenta = precioDeVenta; }
 
-    public String getRuc() {
-        return ruc;
+    public void calcularValores(List<Articulo> articulos) {
+        double sumaArticulos = 0.0;
+        for (DetalleBoleta detalle : detalles) {
+            Articulo articulo = articulos.stream()
+                                         .filter(a -> a.getId().equals(detalle.getArticuloId()))
+                                         .findFirst()
+                                         .orElse(null);
+            if (articulo != null) {
+                sumaArticulos += detalle.getCantidad() * articulo.getValorVentaUnitario();
+            }
+        }
+        this.total = sumaArticulos;
+        this.valorDeVenta = this.total - (this.descuento != null ? this.descuento : 0.0);
+        this.igv = this.total * 0.18; // Asumiendo un IGV del 18%
+        this.precioDeVenta = this.valorDeVenta + this.igv;
     }
-
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
-    }
-
-    public LocalDate getFechaEmision() {
-        return fechaEmision;
-    }
-
-    public void setFechaEmision(LocalDate fechaEmision) {
-        this.fechaEmision = fechaEmision;
-    }
-
-    public LocalDate getFechaVencimiento() {
-        return fechaVencimiento;
-    }
-
-    public void setFechaVencimiento(LocalDate fechaVencimiento) {
-        this.fechaVencimiento = fechaVencimiento;
-    }
-
-    public String getLocalidad() {
-        return localidad;
-    }
-
-    public void setLocalidad(String localidad) {
-        this.localidad = localidad;
-    }
-
-    public String getGuiaRemision() {
-        return guiaRemision;
-    }
-
-    public void setGuiaRemision(String guiaRemision) {
-        this.guiaRemision = guiaRemision;
-    }
-
-    public String getVendedor() {
-        return vendedor;
-    }
-
-    public void setVendedor(String vendedor) {
-        this.vendedor = vendedor;
-    }
-
-    public String getFormaDePago() {
-        return formaDePago;
-    }
-
-    public void setFormaDePago(String formaDePago) {
-        this.formaDePago = formaDePago;
-    }
-
-    public Double getDescuento() {
-        return descuento;
-    }
-
-    public void setDescuento(Double descuento) {
-        this.descuento = descuento;
-    }
-
-    public List<Articulo> getArticulos() {
-        return articulos;
-    }
-
-    public void setArticulos(List<Articulo> articulos) {
-        this.articulos = articulos;
-    }
-
-    // Métodos para cálculos
-    public Double getSumaArticulos() {
-        return articulos.stream()
-                .mapToDouble(Articulo::getTotal)
-                .sum();
-    }
-
-    public Double getValorVenta() {
-        return getSumaArticulos() - descuento;
-    }
-
-    public Double getIGV() {
-        return getValorVenta() * 0.18; // Supongamos que el IGV es 18%
-    }
-
-    public Double getPrecioVenta() {
-        return getValorVenta() + getIGV();
-    }
+    
 }

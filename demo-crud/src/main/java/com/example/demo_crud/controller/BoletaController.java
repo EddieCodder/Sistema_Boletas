@@ -1,56 +1,96 @@
 package com.example.demo_crud.controller;
 
 import com.example.demo_crud.model.Boleta;
-import com.example.demo_crud.services.BoletaService;
+import com.example.demo_crud.model.DetalleBoleta;
+import com.example.demo_crud.model.Articulo;
+import com.example.demo_crud.repository.BoletaRepository;
+import com.example.demo_crud.repository.ArticuloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/boletas")
 public class BoletaController {
 
     @Autowired
-    private BoletaService boletaService;
+    private BoletaRepository boletaRepository;
 
-    @GetMapping
-    public List<Boleta> getAllBoletas() {
-        return boletaService.getAllBoletas();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Boleta> getBoletaById(@PathVariable Long id) {
-        Optional<Boleta> boleta = boletaService.getBoletaById(id);
-        return boleta.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    @Autowired
+    private ArticuloRepository articuloRepository;
 
     @PostMapping
-    public ResponseEntity<Boleta> createBoleta(@RequestBody Boleta boleta) {
-        Boleta savedBoleta = boletaService.saveBoleta(boleta);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBoleta);
+    public Boleta createBoleta(@RequestBody Boleta boleta) {
+        List<Articulo> articulos = articuloRepository.findAllById(
+            boleta.getDetalles().stream()
+                  .map(DetalleBoleta::getArticuloId)
+                  .collect(Collectors.toList())
+        );
+
+        for (DetalleBoleta detalle : boleta.getDetalles()) {
+            Articulo articulo = articulos.stream()
+                                         .filter(a -> a.getId().equals(detalle.getArticuloId()))
+                                         .findFirst()
+                                         .orElse(null);
+            if (articulo != null) {
+                detalle.setArticuloNombre(articulo.getNombre());
+                detalle.setUnidad(articulo.getUnidad());
+                detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());
+            } else {
+                throw new RuntimeException("Artículo no encontrado con ID: " + detalle.getArticuloId());
+            }
+        }
+        boleta.calcularValores(articulos);
+        return boletaRepository.save(boleta);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Boleta> updateBoleta(@PathVariable Long id, @RequestBody Boleta boleta) {
-        if (!boletaService.getBoletaById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
+    public Boleta updateBoleta(@PathVariable Long id, @RequestBody Boleta boleta) {
+        if (boletaRepository.existsById(id)) {
+            boleta.setId(id);
+
+            // Obtener los artículos necesarios
+            List<Articulo> articulos = articuloRepository.findAllById(
+                boleta.getDetalles().stream()
+                      .map(DetalleBoleta::getArticuloId)
+                      .collect(Collectors.toList())
+            );
+
+            for (DetalleBoleta detalle : boleta.getDetalles()) {
+                Articulo articulo = articulos.stream()
+                                             .filter(a -> a.getId().equals(detalle.getArticuloId()))
+                                             .findFirst()
+                                             .orElse(null);
+                if (articulo != null) {
+                    detalle.setArticuloNombre(articulo.getNombre());
+                    detalle.setUnidad(articulo.getUnidad());
+                    detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());
+                } else {
+                    throw new RuntimeException("Artículo no encontrado con ID: " + detalle.getArticuloId());
+                }
+            }
+
+            boleta.calcularValores(articulos);
+            return boletaRepository.save(boleta);
+        } else {
+            throw new RuntimeException("Boleta no encontrada con ID: " + id);
         }
-        boleta.setId(id);
-        Boleta updatedBoleta = boletaService.saveBoleta(boleta);
-        return ResponseEntity.ok(updatedBoleta);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoleta(@PathVariable Long id) {
-        if (!boletaService.getBoletaById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        boletaService.deleteBoleta(id);
-        return ResponseEntity.noContent().build();
+    public void deleteBoleta(@PathVariable Long id) {
+        boletaRepository.deleteById(id);
+    }
+
+    @GetMapping("/{id}")
+    public Boleta getBoleta(@PathVariable Long id) {
+        return boletaRepository.findById(id).orElse(null);
+    }
+
+    @GetMapping
+    public List<Boleta> getAllBoletas() {
+        return boletaRepository.findAll();
     }
 }
