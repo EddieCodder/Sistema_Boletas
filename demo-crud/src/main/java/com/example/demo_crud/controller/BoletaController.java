@@ -47,9 +47,9 @@ public class BoletaController {
     
             if (articulo != null) {
                 detalle.setBoleta(boleta);
-                detalle.setArticuloNombre(articulo.getNombre());
+                /*detalle.setArticuloNombre(articulo.getNombre());
                 detalle.setUnidad(articulo.getUnidad());
-                detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());
+                detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());*/
             } else {
                 throw new RuntimeException("Artículo no encontrado con ID: " + detalle.getArticuloId());
             }
@@ -82,9 +82,9 @@ public class BoletaController {
                                              .orElse(null);
                 if (articulo != null) {
                     detalle.setBoleta(boleta);
-                    detalle.setArticuloNombre(articulo.getNombre());
+                    /*detalle.setArticuloNombre(articulo.getNombre());
                     detalle.setUnidad(articulo.getUnidad());
-                    detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());
+                    detalle.setValorVentaUnitario(articulo.getValorVentaUnitario());*/
                 } else {
                     throw new RuntimeException("Artículo no encontrado con ID: " + detalle.getArticuloId());
                 }
