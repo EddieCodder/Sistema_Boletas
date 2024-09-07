@@ -1,12 +1,12 @@
 package com.example.demo_crud.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.*;
-
 @Entity
 public class Boleta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,18 +19,16 @@ public class Boleta {
     private String localidad;
     private String guiaRemision;
     private String vendedor;
-    private String formaDePago;
-    
-    @OneToMany(mappedBy = "boleta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private String formaPago;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "boleta_id")
     private List<Articulo> articulos;
-    
-    private double sumaArticulos;
+
     private double descuento;
-    private double valorVenta;
-    private double igv;
-    private double precioVenta;
 
     // Getters y Setters
+
     public Long getId() {
         return id;
     }
@@ -103,12 +101,12 @@ public class Boleta {
         this.vendedor = vendedor;
     }
 
-    public String getFormaDePago() {
-        return formaDePago;
+    public String getFormaPago() {
+        return formaPago;
     }
 
-    public void setFormaDePago(String formaDePago) {
-        this.formaDePago = formaDePago;
+    public void setFormaPago(String formaPago) {
+        this.formaPago = formaPago;
     }
 
     public List<Articulo> getArticulos() {
@@ -119,14 +117,6 @@ public class Boleta {
         this.articulos = articulos;
     }
 
-    public double getSumaArticulos() {
-        return sumaArticulos;
-    }
-
-    public void setSumaArticulos(double sumaArticulos) {
-        this.sumaArticulos = sumaArticulos;
-    }
-
     public double getDescuento() {
         return descuento;
     }
@@ -135,27 +125,23 @@ public class Boleta {
         this.descuento = descuento;
     }
 
-    public double getValorVenta() {
-        return valorVenta;
+    // Métodos adicionales para cálculos
+
+    public double calcularTotalArticulos() {
+        return articulos.stream()
+                .mapToDouble(Articulo::getTotal)
+                .sum();
     }
 
-    public void setValorVenta(double valorVenta) {
-        this.valorVenta = valorVenta;
+    public double calcularValorVenta() {
+        return calcularTotalArticulos() - descuento;
     }
 
-    public double getIgv() {
-        return igv;
+    public double calcularIgv() {
+        return calcularValorVenta() * 0.18;
     }
 
-    public void setIgv(double igv) {
-        this.igv = igv;
-    }
-
-    public double getPrecioVenta() {
-        return precioVenta;
-    }
-
-    public void setPrecioVenta(double precioVenta) {
-        this.precioVenta = precioVenta;
+    public double calcularPrecioVenta() {
+        return calcularValorVenta() + calcularIgv();
     }
 }

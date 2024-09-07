@@ -4,35 +4,26 @@ import jakarta.persistence.*;
 
 @Entity
 public class Articulo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
     private String unidad;
     private int cantidad;
     private double valorVentaUnitario;
+
+    @Transient
     private double total;
 
-    @ManyToOne
-    @JoinColumn(name = "boleta_id")
-    private Boleta boleta;
-
     // Getters y Setters
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getUnidad() {
@@ -60,18 +51,10 @@ public class Articulo {
     }
 
     public double getTotal() {
-        return total;
+        return cantidad * valorVentaUnitario;
     }
 
     public void setTotal(double total) {
         this.total = total;
-    }
-
-    public Boleta getBoleta() {
-        return boleta;
-    }
-
-    public void setBoleta(Boleta boleta) {
-        this.boleta = boleta;
     }
 }
