@@ -23,6 +23,7 @@ public class Boleta {
     private String formaDePago;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "boleta")
+
     private List<DetalleBoleta> detalles = new ArrayList<>();
 
     private Double descuento;

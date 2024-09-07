@@ -1,5 +1,7 @@
 package com.example.demo_crud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,7 +12,8 @@ public class DetalleBoleta {
 
     @ManyToOne
     @JoinColumn(name = "boleta_id")
-    private Boleta boleta;
+    @JsonIgnore
+    private Boleta boleta;    
 
     private Long articuloId;
     private Integer cantidad;
