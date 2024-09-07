@@ -3,27 +3,34 @@ package com.example.demo_crud.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "articulos")
 public class Articulo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nombre;
     private String unidad;
-    private int cantidad;
-    private double valorVentaUnitario;
-
-    @Transient
-    private double total;
+    private Integer cantidad;
+    private Double valorVentaUnitario;
+    private Double total;
 
     // Getters y Setters
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getUnidad() {
@@ -34,27 +41,27 @@ public class Articulo {
         this.unidad = unidad;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 
-    public double getValorVentaUnitario() {
+    public Double getValorVentaUnitario() {
         return valorVentaUnitario;
     }
 
-    public void setValorVentaUnitario(double valorVentaUnitario) {
+    public void setValorVentaUnitario(Double valorVentaUnitario) {
         this.valorVentaUnitario = valorVentaUnitario;
     }
 
-    public double getTotal() {
-        return cantidad * valorVentaUnitario;
+    public Double getTotal() {
+        return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(Double total) {
         this.total = total;
     }
 }

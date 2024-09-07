@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name = "boletas")
 public class Boleta {
 
     @Id
@@ -19,16 +20,14 @@ public class Boleta {
     private String localidad;
     private String guiaRemision;
     private String vendedor;
-    private String formaPago;
+    private String formaDePago;
+    private Double descuento;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "boleta_id")
     private List<Articulo> articulos;
 
-    private double descuento;
-
     // Getters y Setters
-
     public Long getId() {
         return id;
     }
@@ -101,12 +100,20 @@ public class Boleta {
         this.vendedor = vendedor;
     }
 
-    public String getFormaPago() {
-        return formaPago;
+    public String getFormaDePago() {
+        return formaDePago;
     }
 
-    public void setFormaPago(String formaPago) {
-        this.formaPago = formaPago;
+    public void setFormaDePago(String formaDePago) {
+        this.formaDePago = formaDePago;
+    }
+
+    public Double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(Double descuento) {
+        this.descuento = descuento;
     }
 
     public List<Articulo> getArticulos() {
@@ -117,31 +124,22 @@ public class Boleta {
         this.articulos = articulos;
     }
 
-    public double getDescuento() {
-        return descuento;
-    }
-
-    public void setDescuento(double descuento) {
-        this.descuento = descuento;
-    }
-
-    // Métodos adicionales para cálculos
-
-    public double calcularTotalArticulos() {
+    // Métodos para cálculos
+    public Double getSumaArticulos() {
         return articulos.stream()
                 .mapToDouble(Articulo::getTotal)
                 .sum();
     }
 
-    public double calcularValorVenta() {
-        return calcularTotalArticulos() - descuento;
+    public Double getValorVenta() {
+        return getSumaArticulos() - descuento;
     }
 
-    public double calcularIgv() {
-        return calcularValorVenta() * 0.18;
+    public Double getIGV() {
+        return getValorVenta() * 0.18; // Supongamos que el IGV es 18%
     }
 
-    public double calcularPrecioVenta() {
-        return calcularValorVenta() + calcularIgv();
+    public Double getPrecioVenta() {
+        return getValorVenta() + getIGV();
     }
 }
