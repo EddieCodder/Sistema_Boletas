@@ -38,17 +38,21 @@ export default class App extends Component {
   }
 
   rowExpansionTemplate(data) {
-    // Mapear los IDs de artículos a nombres
+    // Mapear los IDs de artículos a objetos completos
     const articleMap = this.state.articles.reduce((map, article) => {
-      map[article.id] = article.nombre;
+      map[article.id] = article;
       return map;
     }, {});
 
-    // Agregar nombre del artículo a los detalles
-    const detallesConNombre = data.detalles.map(detalle => ({
-      ...detalle,
-      nombreArticulo: articleMap[detalle.articuloId] || 'Desconocido'
-    }));
+    // Agregar nombre y precio unitario del artículo a los detalles
+    const detallesConNombre = data.detalles.map(detalle => {
+      const articulo = articleMap[detalle.articuloId];
+      return {
+        ...detalle,
+        nombreArticulo: articulo?.nombre || 'Desconocido',
+        precioUnitario: articulo?.valorVentaUnitario || 0 // Asegúrate de que el campo `valorVentaUnitario` esté presente
+      };
+    });
 
     return (
       <div className="boleta-details">
@@ -77,6 +81,7 @@ export default class App extends Component {
           <Column field="articuloId" header="ID Artículo" style={{ width: '8rem' }}></Column>
           <Column field="nombreArticulo" header="Nombre Artículo"></Column>
           <Column field="cantidad" header="Cantidad" style={{ width: '8rem' }}></Column>
+          <Column field="precioUnitario" header="Precio Unitario" body={(rowData) => rowData.precioUnitario.toFixed(2)}></Column>
         </DataTable>
       </div>
     );

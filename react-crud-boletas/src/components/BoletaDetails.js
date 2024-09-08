@@ -41,9 +41,11 @@ const BoletaDetails = ({ boleta, onHide }) => {
         <p><strong>IGV:</strong> {igv.toFixed(2)}</p>
         <p><strong>Precio de Venta:</strong> {precioDeVenta.toFixed(2)}</p>
         <h4>Detalles de los Artículos</h4>
-        <DataTable value={boleta.detalles} paginator rows={10}>
+        <DataTable value={boleta.detalles} paginator rows={10} responsiveLayout="scroll">
           <Column field="articuloId" header="ID Artículo"></Column>
+          <Column field="nombreArticulo" header="Nombre Artículo"></Column>
           <Column field="cantidad" header="Cantidad"></Column>
+          <Column field="precioUnitario" header="Precio Unitario" body={(rowData) => rowData.precioUnitario.toFixed(2)}></Column>
         </DataTable>
         <Button label="Cerrar" icon="pi pi-times" onClick={onHide} />
       </div>
