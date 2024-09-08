@@ -14,6 +14,7 @@ export default class App extends Component {
     super();
     this.state = {
       boletas: [],
+      articles: [],           // Estado para guardar los artículos
       expandedRows: null
     };
 
@@ -23,21 +24,39 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.boletaService.getAll().then(data => {
-      console.log(data);
-      this.setState({ boletas: data });
-    }).catch(error => {
-      console.error("Error al obtener boletas:", error);
+    // Obtener boletas y artículos en paralelo
+    Promise.all([
+      this.boletaService.getAll(),
+      this.boletaService.getArticles()
+    ])
+    .then(([boletas, articles]) => {
+      this.setState({ boletas, articles });
+    })
+    .catch(error => {
+      console.error("Error al obtener datos:", error);
     });
   }
 
   rowExpansionTemplate(data) {
+    // Mapear los IDs de artículos a nombres
+    const articleMap = this.state.articles.reduce((map, article) => {
+      map[article.id] = article.nombre;
+      return map;
+    }, {});
+
+    // Agregar nombre del artículo a los detalles
+    const detallesConNombre = data.detalles.map(detalle => ({
+      ...detalle,
+      nombreArticulo: articleMap[detalle.articuloId] || 'Desconocido'
+    }));
+
     return (
       <div>
         <h4>Detalles de Artículos</h4>
-        <DataTable value={data.detalles} responsiveLayout="scroll">
+        <DataTable value={detallesConNombre} responsiveLayout="scroll">
           <Column field="id" header="ID"></Column>
           <Column field="articuloId" header="ID Artículo"></Column>
+          <Column field="nombreArticulo" header="Nombre Artículo"></Column>
           <Column field="cantidad" header="Cantidad"></Column>
         </DataTable>
       </div>
