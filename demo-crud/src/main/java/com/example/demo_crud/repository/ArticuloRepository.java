@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ArticuloRepository extends JpaRepository<Articulo, Long> {
+    @SuppressWarnings("null")
     List<Articulo> findAllById(Iterable<Long> ids);
 }
