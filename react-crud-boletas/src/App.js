@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 import { BoletaService } from './service/BoletaService';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Panel } from 'primereact/panel';
+import 'primereact/resources/themes/saga-blue/theme.css';  // Importa el tema
+import 'primereact/resources/primereact.min.css';          // Importa los estilos de PrimeReact
+import 'primeicons/primeicons.css';                        // Importa los iconos de PrimeIcons
 
 export default class App extends Component {
   constructor() {
@@ -14,7 +20,6 @@ export default class App extends Component {
 
   componentDidMount() {
     this.boletaService.getAll().then(data => {
-      console.log(data);
       this.setState({ boletas: data });  // Guardar los datos en el estado
     }).catch(error => {
       console.error("Error al obtener boletas:", error);
@@ -24,14 +29,17 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <h1>Lista de Boletas</h1>
-        <ul>
-          {this.state.boletas.map(boleta => (
-            <li key={boleta.id}>
-              Cliente: {boleta.cliente}, Total: {boleta.total}
-            </li>
-          ))}
-        </ul>
+        <Panel header="Lista de Boletas" style={{ margin: '20px' }}>
+          <DataTable value={this.state.boletas} paginator rows={10} responsiveLayout="scroll">
+            <Column field="id" header="ID Boleta"></Column>
+            <Column field="cliente" header="Cliente"></Column>
+            <Column field="direccion" header="Dirección"></Column>
+            <Column field="ruc" header="RUC"></Column>
+            <Column field="total" header="Total"></Column>
+            <Column field="fechaEmision" header="Fecha de Emisión"></Column>
+            <Column field="fechaVencimiento" header="Fecha de Vencimiento"></Column>
+          </DataTable>
+        </Panel>
       </div>
     );
   }
