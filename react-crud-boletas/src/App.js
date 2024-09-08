@@ -15,7 +15,7 @@ export default class App extends Component {
     this.state = {
       boletas: [],
       articles: [],           // Estado para guardar los artículos
-      expandedRows: null
+      expandedRows: []       // Estado para manejar las filas expandidas
     };
 
     this.boletaService = new BoletaService();
@@ -51,13 +51,32 @@ export default class App extends Component {
     }));
 
     return (
-      <div>
+      <div className="boleta-details">
+        <h4>Detalles de la Boleta</h4>
+        <div className="boleta-info">
+          <div className="info-item"><strong>ID Boleta:</strong> {data.id}</div>
+          <div className="info-item"><strong>Cliente:</strong> {data.cliente}</div>
+          <div className="info-item"><strong>Dirección:</strong> {data.direccion}</div>
+          <div className="info-item"><strong>RUC:</strong> {data.ruc}</div>
+          <div className="info-item"><strong>Fecha de Emisión:</strong> {data.fechaEmision}</div>
+          <div className="info-item"><strong>Fecha de Vencimiento:</strong> {data.fechaVencimiento}</div>
+          <div className="info-item"><strong>Localidad:</strong> {data.localidad}</div>
+          <div className="info-item"><strong>Guía de Remisión:</strong> {data.guiaRemision}</div>
+          <div className="info-item"><strong>Vendedor:</strong> {data.vendedor}</div>
+          <div className="info-item"><strong>Forma de Pago:</strong> {data.formaDePago}</div>
+          <div className="info-item"><strong>Descuento:</strong> {data.descuento}</div>
+          <div className="info-item"><strong>Total:</strong> {data.total}</div>
+          <div className="info-item"><strong>Valor de Venta:</strong> {data.valorDeVenta}</div>
+          <div className="info-item"><strong>IGV:</strong> {data.igv}</div>
+          <div className="info-item"><strong>Precio de Venta:</strong> {data.precioDeVenta}</div>
+        </div>
+        
         <h4>Detalles de Artículos</h4>
-        <DataTable value={detallesConNombre} responsiveLayout="scroll">
-          <Column field="id" header="ID"></Column>
-          <Column field="articuloId" header="ID Artículo"></Column>
+        <DataTable value={detallesConNombre} responsiveLayout="scroll" stripedRows>
+          <Column field="id" header="ID" style={{ width: '5rem' }}></Column>
+          <Column field="articuloId" header="ID Artículo" style={{ width: '8rem' }}></Column>
           <Column field="nombreArticulo" header="Nombre Artículo"></Column>
-          <Column field="cantidad" header="Cantidad"></Column>
+          <Column field="cantidad" header="Cantidad" style={{ width: '8rem' }}></Column>
         </DataTable>
       </div>
     );

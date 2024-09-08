@@ -36,3 +36,41 @@
     transform: rotate(360deg);
   }
 }
+
+/* Nuevos estilos para el panel de boletas y detalles */
+
+.boleta-details {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.boleta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.info-item {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.info-item strong {
+  display: inline-block;
+  width: 200px;
+  color: #333;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
